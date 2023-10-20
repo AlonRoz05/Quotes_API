@@ -3,7 +3,6 @@ import pandas as pd
 import random
 
 from fastapi import FastAPI
-import uvicorn
 
 from better_profanity import profanity
 
