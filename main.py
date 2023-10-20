@@ -62,7 +62,3 @@ async def return_quote(tag: str):
 
     models_quote = models_quote[0]["generated_text"]
     return {"quote": models_quote}
-
-
-if __name__ == "__main":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
