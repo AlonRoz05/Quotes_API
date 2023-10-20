@@ -17,7 +17,11 @@ profanity.load_censor_words()
 tags_path = "tags.json"
 
 @app.get("/")
-async def return_quote(tag: str):
+async def root():
+    return {"message": "Go to get-quote to generate a quote with a tag."}
+
+@app.get("/get-quote")
+async def get_quote(tag: str):
     for i in range(5):
         if i == 0:
             tag_1 = random.choice(pd.read_json(tags_path)["tags"])
