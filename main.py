@@ -12,9 +12,7 @@ app = FastAPI()
 
 classifier = pipeline("text2text-generation", model="Rozi05/QuoteVibes_Model_Trained")
 
-profanity.load_censor_words()
-
-tags_path = "tags.json"
+TAGS_PATH = "tags.json"
 
 @app.get("/")
 async def root():
@@ -24,35 +22,37 @@ async def root():
 async def get_quote(tag: str):
     for i in range(5):
         if i == 0:
-            tag_1 = random.choice(pd.read_json(tags_path)["tags"])
+            tag_1 = random.choice(pd.read_json(TAGS_PATH)["tags"])
             while tag_1 == tag:
-                tag_2 = random.choice(pd.read_json(tags_path)["tags"])
+                tag_2 = random.choice(pd.read_json(TAGS_PATH)["tags"])
             
         if i == 1:
-            tag_2 = random.choice(pd.read_json(tags_path)["tags"])
+            tag_2 = random.choice(pd.read_json(TAGS_PATH)["tags"])
             while tag_2 == tag_1 or tag_2 == tag:
-                tag_2 = random.choice(pd.read_json(tags_path)["tags"])
+                tag_2 = random.choice(pd.read_json(TAGS_PATH)["tags"])
                 
         elif i == 2:
-            tag_3 = random.choice(pd.read_json(tags_path)["tags"])
+            tag_3 = random.choice(pd.read_json(TAGS_PATH)["tags"])
             while tag_3 == tag_1 and tag_3 == tag_2 or tag_3 == tag:
-                tag_3 = random.choice(pd.read_json(tags_path)["tags"])
+                tag_3 = random.choice(pd.read_json(TAGS_PATH)["tags"])
         
         elif i == 3:
-            tag_4 = random.choice(pd.read_json(tags_path)["tags"])
+            tag_4 = random.choice(pd.read_json(TAGS_PATH)["tags"])
             while tag_4 == tag_1 and tag_4 == tag_2 and tag_4 == tag_3 or tag_4 == tag:
-                tag_4 = random.choice(pd.read_json(tags_path)["tags"])
+                tag_4 = random.choice(pd.read_json(TAGS_PATH)["tags"])
         
         elif i == 4:
-            tag_5 = random.choice(pd.read_json(tags_path)["tags"])
+            tag_5 = random.choice(pd.read_json(TAGS_PATH)["tags"])
             while tag_5 == tag_1 and tag_5 == tag_2 and tag_5 == tag_3 and tag_5 == tag_4 or tag_5 == tag:
-                tag_5 = random.choice(pd.read_json(tags_path)["tags"])
+                tag_5 = random.choice(pd.read_json(TAGS_PATH)["tags"])
 
     tags = f"{tag};{tag_1};{tag_2};{tag_3};{tag_4};{tag_5};{tag}"
     if tag == "default":
         tags = f"{tag_1};{tag_2};{tag_3};{tag_4};{tag_5}"
 
     models_quote = classifier(tags)
+    
+    profanity.load_censor_words()
 
     check_for_profanity = profanity.censor(models_quote[0]["generated_text"])
     test_for_text = models_quote[0]["generated_text"].replace(" ", "x")
