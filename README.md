@@ -1,6 +1,4 @@
-# Motivational App API
-
-![Motivational App Logo](your-logo.png)
+# Quotes API
 
 ## Overview
 
