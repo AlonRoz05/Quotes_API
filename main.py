@@ -6,23 +6,21 @@ import json
 
 app = FastAPI()
 
-tags_file_path = "tags.json"
-with open(tags_file_path, "r") as file:
+with open("tags.json", "r") as file:
     tags_data = json.load(file)
 
 profanity.load_censor_words()
 
-model_name = "Rozi05/QuoteVibes_Model_Trained"
-classifier = pipeline("text2text-generation", model=model_name)
+classifier = pipeline("text2text-generation", model="Rozi05/QuoteVibes_Model_Trained")
 
 @app.get("/")
 async def root():
-    return {"message": "Make sure your url is for the right page."}
+    return {"message": "Make sure you're on the correct page."}
 
 @app.get("/get-quote/{tag}")
 async def get_quote(tag: str):
     tagsInUse = []
-    for _ in range(5):
+    for i in range(5):
         while True:
             chosen_tag = random.choice(tags_data["tags"])
             if (chosen_tag not in tagsInUse) and chosen_tag != tag:
@@ -33,16 +31,14 @@ async def get_quote(tag: str):
         tags = f"{tagsInUse[0]};{tagsInUse[1]};{tagsInUse[2]};{tagsInUse[3]};{tagsInUse[4]}"
     else:
         tags = f"{tag};{tagsInUse[0]};{tagsInUse[1]};{tagsInUse[2]};{tagsInUse[3]};{tagsInUse[4]};{tag}"
-
-    models_quote = classifier(tags)
-
-    check_for_profanity = profanity.censor(models_quote[0]["generated_text"])
-    test_for_text = models_quote[0]["generated_text"].replace(" ", "x")
-
-    while "*" in check_for_profanity or test_for_text == "xxxxxxxxx":
+        
+    while True:
         models_quote = classifier(tags)
 
         check_for_profanity = profanity.censor(models_quote[0]["generated_text"])
         test_for_text = models_quote[0]["generated_text"].replace(" ", "x")
+        
+        if not ("*" in check_for_profanity) or test_for_text != "xxxxxxxxx":
+            break
 
     return {"quote": models_quote[0]["generated_text"]}
