@@ -4,14 +4,13 @@ from better_profanity import profanity
 import random
 import json
 
-app = FastAPI()
+classifier = pipeline("text2text-generation", model="Rozi05/QuoteVibes_Model_Trained")
+profanity.load_censor_words()
 
 with open("tags.json", "r") as file:
     tags_data = json.load(file)
 
-profanity.load_censor_words()
-
-classifier = pipeline("text2text-generation", model="Rozi05/QuoteVibes_Model_Trained")
+app = FastAPI()
 
 @app.get("/")
 async def root():
@@ -39,6 +38,4 @@ async def get_quote(tag: str):
         test_for_text = models_quote[0]["generated_text"].replace(" ", "x")
         
         if not ("*" in check_for_profanity) or test_for_text != "xxxxxxxxx":
-            break
-
-    return {"quote": models_quote[0]["generated_text"]}
+            return {"quote": models_quote[0]["generated_text"]}
