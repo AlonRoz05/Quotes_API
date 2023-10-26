@@ -12,10 +12,6 @@ with open("tags.json", "r") as file:
 
 app = FastAPI()
 
-@app.get("/")
-async def root():
-    return {"message": "Make sure you're on the correct page."}
-
 @app.get("/get-quote/{tag}")
 async def get_quote(tag: str):
     tagsInUse = []
