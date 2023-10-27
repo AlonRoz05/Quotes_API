@@ -3,6 +3,7 @@ from transformers import pipeline
 from better_profanity import profanity
 import random
 import json
+from mangum import Mangum
 
 classifier = pipeline("text2text-generation", model="Rozi05/QuoteVibes_Model_Trained")
 profanity.load_censor_words()
@@ -11,6 +12,7 @@ with open("tags.json", "r") as file:
     tags_data = json.load(file)
 
 app = FastAPI()
+handler = Mangum(app)
 
 @app.get("/get-quote/{tag}")
 async def get_quote(tag: str):
