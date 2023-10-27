@@ -160,5 +160,4 @@ cython_debug/
 #.idea/
 
 .vscode
-lib
-lambda_function.zip
+.DS_Store
