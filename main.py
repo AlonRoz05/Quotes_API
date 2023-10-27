@@ -19,7 +19,7 @@ handler = Mangum(app)
 
 @app.get("/")
 async def root():
-    return {"message" : "Make sure you on the right page."}
+    return {"message" : "Please ensure you're on the correct page."}
 
 @app.get("/get-quote/{tag}")
 async def get_quote(tag: str):
