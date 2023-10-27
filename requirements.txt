@@ -1,4 +1,4 @@
 fastapi
 uvicorn
-transformers
-better-profanity
+mangum
+requests
