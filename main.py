@@ -31,16 +31,15 @@ async def get_quote(tag: str):
                 tagsInUse.append(chosen_tag)
                 break
 
-    tags = f"{tag};{tagsInUse[0]};{tagsInUse[1]};{tagsInUse[2]};{tagsInUse[3]};{tagsInUse[4]};{tag}"
-
-    if tag == "default":
-        tags = f"{tagsInUse[0]};{tagsInUse[1]};{tagsInUse[2]};{tagsInUse[3]};{tagsInUse[4]}"
+    tags = f"{tagsInUse[0]};{tagsInUse[1]};{tagsInUse[2]};{tagsInUse[3]};{tagsInUse[4]}"
+    if tag != "default":
+        tags = f"{tag};" + tags + f";{tag}"
 
     while True:
-        models_quote = query({"inputs": tags})[0]["generated_text"]
+        models_quote = query({"inputs": tags})
 
-        # check for profanity
-        test_for_text = models_quote.replace(" ", "x")
+        # here you need to check for profanity
+        test_for_text = models_quote[0]["generated_text"].replace(" ", "x")
 
         if test_for_text != "xxxxxxxxx":
-            return {"quote": models_quote}
+            return {"quote": models_quote[0]["generated_text"]}
