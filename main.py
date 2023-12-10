@@ -1,45 +1,44 @@
-from fastapi import FastAPI
-from mangum import Mangum
-from requests import post
-from random import choice
-from json import load
+import requests
+import random
+import json
 
 API_URL = "https://api-inference.huggingface.co/models/Rozi05/QuoteVibes_Model_Trained"
 headers = {"Authorization": "Bearer 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"}
 
+with open("tags.json", "r") as file:
+    tags_data = json.load(file)
+
 def query(payload):
-	response = post(API_URL, headers=headers, json=payload)
+	response = requests.post(API_URL, headers=headers, json=payload)
 	return response.json()
 
-with open("tags.json", "r") as file:
-    tags_data = load(file)
+def lambda_handler(event, context):
+    input_tag = event['queryStringParameters']['input_tag']
+    tagsInUse = [random.choice(tags_data["tags"]) for _ in range(5)]
 
-app = FastAPI()
-handler = Mangum(app)
+    tags = ";".join(tagsInUse)
+    if input_tag != "default":
+        tags = f"{input_tag};{tags};{input_tag}"
 
-@app.get("/")
-async def root():
-    return {"message" : "Please ensure you're on the correct page."}
-
-@app.get("/get-quote/{tag}")
-async def get_quote(tag: str):
-    tagsInUse = []
-    for _ in range(5):
-        while True:
-            chosen_tag = choice(tags_data["tags"])
-            if (chosen_tag not in tagsInUse) and chosen_tag != tag:
-                tagsInUse.append(chosen_tag)
-                break
-
-    tags = f"{tagsInUse[0]};{tagsInUse[1]};{tagsInUse[2]};{tagsInUse[3]};{tagsInUse[4]}"
-    if tag != "default":
-        tags = f"{tag};" + tags + f";{tag}"
-
+    times_ran = 0
     while True:
+        times_ran += 1
         models_quote = query({"inputs": tags})
 
-        # here you need to check for profanity
-        test_for_text = models_quote[0]["generated_text"].replace(" ", "x")
+        if models_quote != "         ": # and check for profanity
+            break
+        
+        if times_ran >= 15:
+            models_quote = [{"generated_text": "Sorry, Unable to generate any quotes for that tag. Please try again later."}]
+            break
 
-        if test_for_text != "xxxxxxxxx":
-            return {"quote": models_quote[0]["generated_text"]}
+    response_body = {}
+    response_body["quote"] = models_quote[0]["generated_text"]
+
+    http_response = {}
+    http_response["statusCode"] = 200
+    http_response["headers"] = {}
+    http_response["headers"]["Content-Type"] = "application/json"
+    http_response["body"] = json.dumps(response_body)
+    
+    return http_response
